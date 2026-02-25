@@ -52,8 +52,6 @@ body {
 }
 
 .editor-panel {
-  width: 320px;
-  min-width: 320px;
   background: var(--bg-primary);
   border-right: 1px solid var(--border);
   display: flex;
@@ -106,7 +104,7 @@ body {
   bottom: 0;
   left: 0;
   right: 0;
-  background: rgba(2ef, 68, 68, 0.1);
+  background: rgba(239, 68, 68, 0.1);
   border-top: 1px solid rgba(239, 68, 68, 0.3);
   color: var(--danger);
   padding: 8px 16px;
@@ -358,7 +356,6 @@ body {
 }
 
 
-
 .canvas-container {
   flex: 1;
   display: flex;
@@ -519,13 +516,13 @@ body {
 }
 
 .react-flow__edge-path {
-  stroke: var(--text-secondary);
-  stroke-width: 1.5;
+  stroke: #6366f1;
+  stroke-width: 2;
 }
 
 .react-flow__edge.selected .react-flow__edge-path {
   stroke: var(--accent);
-  stroke-width: 2;
+  stroke-width: 2.5;
 }
 
 .react-flow__controls {
@@ -549,4 +546,12 @@ body {
   background: var(--bg-secondary);
   border: 1px solid var(--border);
   border-radius: 6px;
+}
+
+.react-flow {
+  background: var(--bg-primary) !important;
+}
+
+.react-flow__background pattern circle {
+  fill: #333333 !important;
 }

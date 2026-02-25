@@ -1,6 +1,6 @@
 'use client';
 
-import { BaseEdge, EdgeLabelRenderer, EdgeProps, getBezierPath, getSmoothStepPath } from '@xyflow/react';
+import { EdgeLabelRenderer, EdgeProps, getBezierPath } from '@xyflow/react';
 import { RelationData } from '@/types/database';
 
 export function RelationEdge({
@@ -12,7 +12,6 @@ export function RelationEdge({
   sourcePosition,
   targetPosition,
   style = {},
-  markerEnd,
   data,
 }: EdgeProps) {
   const [edgePath, labelX, labelY] = getBezierPath({
@@ -26,31 +25,92 @@ export function RelationEdge({
 
   const relationData = data as unknown as RelationData;
   const relType = relationData?.relationType || 'one-to-many';
+  const sourceCol = relationData?.sourceColumn || '?';
+  const targetCol = relationData?.targetColumn || '?';
 
-  let label = '1:N';
-  if (relType === 'one-to-one') label = '1:1';
-  if (relType === 'many-to-many') label = 'N:M';
+  let typeLabel = '1 : N';
+  let sourceType = 'one';
+  let targetType = 'many';
+
+  if (relType === 'one-to-one') {
+    typeLabel = '1 : 1';
+    sourceType = 'one';
+    targetType = 'one';
+  } else if (relType === 'many-to-many') {
+    typeLabel = 'N : M';
+    sourceType = 'many';
+    targetType = 'many';
+  }
+
+  const color = '#6366f1';
+  const markerSize = 10;
+
+  const sourceMarkers = [];
+  const targetMarkers = [];
+
+  if (sourceType === 'one') {
+    sourceMarkers.push(
+      <line key="s-one" x1={sourceX + 6} y1={sourceY - markerSize} x2={sourceX + 6} y2={sourceY + markerSize} stroke={color} strokeWidth={2} />
+    );
+  } else {
+    sourceMarkers.push(
+      <line key="s-m1" x1={sourceX} y1={sourceY} x2={sourceX + 14} y2={sourceY - markerSize} stroke={color} strokeWidth={2} />,
+      <line key="s-m2" x1={sourceX} y1={sourceY} x2={sourceX + 14} y2={sourceY} stroke={color} strokeWidth={2} />,
+      <line key="s-m3" x1={sourceX} y1={sourceY} x2={sourceX + 14} y2={sourceY + markerSize} stroke={color} strokeWidth={2} />,
+    );
+  }
+
+  if (targetType === 'one') {
+    targetMarkers.push(
+      <line key="t-one" x1={targetX - 6} y1={targetY - markerSize} x2={targetX - 6} y2={targetY + markerSize} stroke={color} strokeWidth={2} />
+    );
+  } else {
+    targetMarkers.push(
+      <line key="t-m1" x1={targetX} y1={targetY} x2={targetX - 14} y2={targetY - markerSize} stroke={color} strokeWidth={2} />,
+      <line key="t-m2" x1={targetX} y1={targetY} x2={targetX - 14} y2={targetY} stroke={color} strokeWidth={2} />,
+      <line key="t-m3" x1={targetX} y1={targetY} x2={targetX - 14} y2={targetY + markerSize} stroke={color} strokeWidth={2} />,
+    );
+  }
 
   return (
     <>
-      <BaseEdge path={edgePath} markerEnd={markerEnd} style={style} id={id} />
+      <path
+        d={edgePath}
+        fill="none"
+        stroke={color}
+        strokeWidth={2}
+        className="react-flow__edge-path"
+      />
+
+      {sourceMarkers}
+      {targetMarkers}
+
       <EdgeLabelRenderer>
         <div
           style={{
             position: 'absolute',
             transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
-            background: 'var(--bg-tertiary)',
-            padding: '2px 6px',
-            borderRadius: '4px',
+            background: '#0a0a0a',
+            padding: '4px 10px',
+            borderRadius: '6px',
             fontSize: '10px',
-            fontWeight: '600',
-            color: 'var(--accent)',
-            border: '1px solid var(--border)',
+            fontWeight: 600,
+            color: '#a5b4fc',
+            border: '1px solid #6366f1',
             pointerEvents: 'all',
+            display: 'flex',
+            flexDirection: 'column' as const,
+            alignItems: 'center',
+            gap: '2px',
+            lineHeight: 1.3,
+            boxShadow: '0 2px 8px rgba(0,0,0,0.4)',
           }}
           className="nodrag nopan"
         >
-          {label}
+          <span style={{ fontWeight: 700, letterSpacing: '0.5px' }}>{typeLabel}</span>
+          <span style={{ color: '#7c83db', fontSize: '9px', fontWeight: 400 }}>
+            {sourceCol} → {targetCol}
+          </span>
         </div>
       </EdgeLabelRenderer>
     </>

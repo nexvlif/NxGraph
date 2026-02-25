@@ -4,7 +4,7 @@ import { Column, RelationData, RelationType, TableData } from '@/types/database'
 
 export interface ParsedDiagram {
   tables: { id: string; data: TableData; position: { x: number; y: number } }[];
-  relations: { id: string; source: string; target: string; data: RelationData }[];
+  relations: { id: string; source: string; target: string; sourceHandle?: string; targetHandle?: string; data: RelationData }[];
 }
 
 export function parseDBML(text: string): ParsedDiagram {
@@ -58,7 +58,7 @@ export function parseDBML(text: string): ParsedDiagram {
 
       currentTable.columns.push(newColumn);
 
-      const refMatch = line.match(/\[ref:\s*([><-])\s*([a-zA-Z0-9_]+)\.([a-zA-Z0-9_]+)\]/i);
+      const refMatch = line.match(/ref:\s*([><\-])\s*([a-zA-Z0-9_]+)\.([a-zA-Z0-9_]+)/i);
       if (refMatch) {
         const symbol = refMatch[1];
         const targetTableName = refMatch[2];
@@ -85,6 +85,8 @@ export function parseDBML(text: string): ParsedDiagram {
             id: `edge-${nanoid(8)}`,
             source: table.id,
             target: targetTable.id,
+            sourceHandle: col.name,
+            targetHandle: targetInfo.columnName,
             data: {
               relationType: targetInfo.relType,
               sourceColumn: col.name,
